@@ -1,36 +1,53 @@
-<template>
-  <div class="home flex-grow-1 d-flex flex-column align-items-center justify-content-center">
-    <div class="home-card p-5 bg-white rounded elevation-3">
-      <img src="https://bcw.blob.core.windows.net/public/img/8600856373152463" alt="CodeWorks Logo" class="rounded-circle">
-      <h1 class="my-5 bg-dark text-white p-3 rounded text-center">
-        Vue 3 Starter
-      </h1>
-    </div>
+<template class="content-fluid">
+<div class="d-flex justify-content-center mt-3">
+<h1 >Picture of the day by NASA</h1>
+</div>
+<div  class="d-flex justify-content-center mt-2">
+  <div class="card apod rounded">
+  <img class="rounded elevation-3" :src="apod" alt="">
   </div>
+  </div >
+<div class="d-flex justify-content-center ">
+</div>
+<div class="d-flex justify-content-center  mb-4">
+  <form @submit.prevent="getDate()">
+  <input class="rounded border-0 elevation-2 me-2" placeholder="  Enter a Date:" v-model="date" for="date" type="date">
+  <button class="btn btn-primary elevation-2" type="submit">Submit</button>
+  </form>
+</div>
 </template>
 
 <script>
+import { computed, onMounted, ref } from "@vue/runtime-core"
+import { AppState } from "../AppState"
+import { apodService } from "../services/apodService"
+import { logger } from "../utils/Logger"
 export default {
-  name: 'Home'
+  setup() {
+    const date = ref('')
+    onMounted(async()=>{
+      await apodService.getApod()
+  })
+  return{
+    apod: computed (()=> AppState.apod.apod),
+    date,
+    async getDate(){
+      try {
+        await apodService.getDatedApod(date.value)
+      } catch (error) {
+        logger.log(error)
+      }
+    }
+  } 
+  }
 }
+
+
 </script>
 
 <style scoped lang="scss">
-.home{
-  display: grid;
-  height: 80vh;
-  place-content: center;
-  text-align: center;
-  user-select: none;
-  .home-card{
-    width: 50vw;
-    > img{
-      height: 200px;
-      max-width: 200px;
-      width: 100%;
-      object-fit: contain;
-      object-position: center;
-    }
-  }
+.apod{
+width: 60%;
+margin-bottom: 3em;
 }
 </style>
